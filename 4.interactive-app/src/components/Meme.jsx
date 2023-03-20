@@ -1,24 +1,28 @@
-import memesData from '../memesData';
 import React from 'react';
 
 export default function Meme() {
+	
 	const [meme, changeMeme] = React.useState({
 		topText: '',
 		bottomText: '',
 		memePic: '../images/memeimg.png'
 	});
 
-	const [allMemeImages, changeMemes] = React.useState(memesData);
+	const [allMemeImages, changeMemes] = React.useState([]);
+	React.useEffect( () => {
+		fetch("https://api.imgflip.com/get_memes")
+            .then(res => res.json())
+            .then(data => changeMemes(data.data.memes))
+	}, []);
 
 	const [memeForm, changeMemeForm] = React.useState({
 		topText: "",
 		bottomText: ""
 	});
  
-	function newMemeImage(props) {
-		const memesArray = memesData.data.memes;
-		const rand = Math.floor(Math.random() * memesArray.length);
-		const url = memesArray[rand].url;
+	function newMemeImage() {
+		const rand = Math.floor(Math.random() * allMemeImages.length);
+		const url = allMemeImages[rand].url;
 		changeMeme( (oldMeme) => {
 			return {
 				...oldMeme,
@@ -37,18 +41,9 @@ export default function Meme() {
 		});
 	}
 
-	// let topTextMeme;
-	// let bottomTextMeme;
-	// function handleSubmit(event) {
-	// 	event.preventDefault();
-	// 	console.log("top text: ",memeForm.topText, "bottom text: ",memeForm.bottomText);
-	// 	topTextMeme = memeForm.topText;
-	// 	bottomTextMeme = memeForm.bottomText;
-	// }
-
 	return (
 		<main>
-			<form className="meme-form" /*onSubmit={handleSubmit} */>
+			<div className="meme-form" /*onSubmit={handleSubmit} */>
 				<input 
 					type="text"
 					placeholder="Top text"
@@ -67,7 +62,7 @@ export default function Meme() {
 				/>
 				{/* react event listener */}
 				<button onClick={newMemeImage} className="meme-button">Get new meme image</button>
-			</form>
+			</div>
 			<div className="meme">
 				<img src={meme.memePic} alt="a random meme" className="meme-image"></img>
 				<h2 className='meme-text top'>{memeForm.topText}</h2>
